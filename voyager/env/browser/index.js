@@ -2,6 +2,7 @@ const express = require("express");
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
+const { exec } = require("child_process");
 
 let page;
 let browser;
@@ -21,24 +22,6 @@ const defaultClickables = [
   "HTMLAnchorElement",
   "HTMLInputElement",
   "HTMLTextAreaElement",
-  // "HTMLLabelElement",
-  // "HTMLFieldSetElement",
-  // "HTMLLegendElement",
-  // "HTMLOptGroupElement",
-  // "HTMLOptionElement",
-  // "HTMLDataListElement",
-  // "HTMLMeterElement",
-  // "HTMLProgressElement",
-  // "HTMLSelectElement",
-  // "HTMLDetailsElement",
-  // "HTMLDialogElement",
-  // "HTMLMenuElement",
-  // "HTMLMenuItemElement",
-  // "HTMLSummaryElement",
-  // "HTMLTrackElement",
-  // "HTMLVideoElement",
-  // "HTMLAudioElement",
-  // "HTMLSourceElement",
 ];
 
 function shortenSelector(longSelector) {
@@ -211,10 +194,12 @@ async function recordEvent(log, error) {
     log,
     workspace,
     currentUrl: page.url(),
-    clickables: await getClickableElements(),
+    // clickables: await getClickableElements(),
     error,
-    text: await getPageTextContent(),
+    // text: await getPageTextContent(),
   };
+
+  // console.log(event);
 
   eventsCache.push(event);
 }
@@ -225,7 +210,7 @@ async function init() {
     args: ["--lang=en-US,en"],
   });
   page = await browser.newPage();
-  await page.goto("https://www.example.com");
+  await page.goto("https://www.google.com");
 }
 
 init();
@@ -233,8 +218,6 @@ init();
 const app = express();
 
 app.use(express.json());
-// Example call
-// curl -X POST -H "Content-Type: application/json" -d '{"code": "async function exampleFunction() {await page.goto(`https://www.google.com`); await recordEvent(`Navigated to Google`);}" }' http://localhost:3000/execute
 
 app.post("/execute", async (req, res) => {
   try {
@@ -244,7 +227,8 @@ app.post("/execute", async (req, res) => {
         /(\r\n|\n|\r)/gm,
         ""
       )};(async () => {${code}})()`;
-      await eval(refactoredCode);
+      const eg = await eval(refactoredCode);
+      console.log(eg, "eg");
     }
     await recordEvent("observe");
   } catch (e) {

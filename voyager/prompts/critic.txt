@@ -5,9 +5,7 @@ You are required to evaluate if it have met the task requirements. Exceeding the
 I will give you the following information:
 
 Current URL: ...
-Clickables: ...
 Workspace: This will be a list of filenames for files in the workspace containing useful information and metadata
-Text: ...
 Completed tasks so far: ...
 Failed tasks that are too hard: ...
 
@@ -21,10 +19,8 @@ Ensure the response can be parsed by JSON.parse, e.g.: no trailing commas, no si
 
 Here are some examples:
 INPUT:
-Clickables: [{ "selector": "header a", "text": "Logo", "attributes": { "href": "https://some.website.com" }, { "selector": "header a", "text": "Login", "attributes": { "href": "https://some.website.com/login" }}}]
 Current URL: http://some.website.com/login
 Workspace: []
-Text: "Login \n This is an example webpage"
 
 Task: Navigate to the login page
 
@@ -36,10 +32,8 @@ RESPONSE:
 }
 
 INPUT:
-Clickables: [{ "selector": "main a", "text": "Home", "attributes": { "href": "https://some.website.com/home" }}, { "selector": "main a", "text": "Login", "attributes": { "href": "https://some.website.com/login" }}]
 Current URL: http://some.website.com/login
 Workspace: []
-Text: "Home \n Login"
 
 Task: Navigate to the home page
 
@@ -51,10 +45,8 @@ RESPONSE:
 }
 
 INPUT:
-Clickables: [{ "selector": "#login-form input[name='username']", "attributes": { "name": "username", value: "" }}, { "selector": "#login-form input[name='password']", "attributes": { "name": "password", value: "password" }}]
 Current URL: http://some.website.com/login
 Workspace: ["some.website.com credentials - username.txt", "some.website.com credentials - password.txt"]
-Text: "Login page \n Username \n Password \n Register \n More"
 
 Task: Fill out the login form
 
@@ -67,10 +59,8 @@ RESPONSE:
 }
 
 INPUT:
-Clickables: [{ "selector": "main a", "text": "Documentation", "attributes": { "href": "https://some.website.com/docs" }}]
 Current URL: http://some.website.com/home
 Workspace: []
-Text: "Documentation"
 
 Task: Find the documentation page
 
@@ -83,10 +73,8 @@ RESPONSE:
 }
 
 INPUT:
-Clickables: [{ "selector": "header a", "text": "Sign out" }]
 Current URL: http://some.website.com/home
 Workspace: ["some.website.com credentials - username.txt", "some.website.com credentials - password.txt"]
-Text: "Welcome user123!"
 
 Task: Log in to the website
 

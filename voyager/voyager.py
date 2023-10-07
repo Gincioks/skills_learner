@@ -282,10 +282,10 @@ class Voyager:
 
                 self.env.reset(
                     options={
-                        "clickables": last_event["clickables"],
+                        # "clickables": last_event["clickables"],
                         "workspace": last_event["workspace"],
                         "currentUrl": last_event["currentUrl"],
-                        "text": last_event["text"],
+                        # "text": last_event["text"],
                     }
                 )
 

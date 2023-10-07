@@ -77,9 +77,9 @@ class CurriculumAgent:
         return [
             "context",
             "current_url",
-            "clickables",
+            # "clickables",
             "workspace",
-            "text",
+            # "text",
             "completed_tasks",
             "failed_tasks",
         ]
@@ -99,9 +99,9 @@ class CurriculumAgent:
 
         event = events[-1]
         current_url = event["currentUrl"]
-        clickables = event["clickables"]
+        # clickables = event["clickables"]
         workspace = event["workspace"]
-        text = event["text"]
+        # text = event["text"]
 
         completed_tasks = (
             ", ".join(self.completed_tasks) if self.completed_tasks else "None"
@@ -116,9 +116,9 @@ class CurriculumAgent:
         observation = {
             "context": "",
             "current_url": f"Current URL: {current_url}\n\n",
-            "clickables": f"Clickables: {clickables}\n\n",
+            # "clickables": f"Clickables: {clickables}\n\n",
             "workspace": f"Workspace: {workspace}\n\n",
-            "text": f"Text: {text}\n\n",
+            # "text": f"Text: {text}\n\n",
             "completed_tasks": f"Completed tasks so far: {completed_tasks}\n\n",
             "failed_tasks": f"Failed tasks that are too hard: {failed_tasks}\n\n",
         }
@@ -152,7 +152,7 @@ class CurriculumAgent:
 
     def propose_next_task(self, *, events, max_retries=5):
         if self.progress == 0 and self.mode == "auto":
-            task = "Get all information about Petals"
+            task = "Get all information about Petals from github.com/bigscience-workshop/petals and run it on your machine."
             context = "Petals is a python package from bigscience-workshop to run large language models at home, BitTorrent-style. Fine-tuning and inference up to 10x faster than offloading."  # noqa: E501
             return task, context
 

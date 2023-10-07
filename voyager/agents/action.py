@@ -54,10 +54,10 @@ class ActionAgent:
             "writeFile",
             "readFile",
             "clickElement",
+            "executeShellScript",
             "typeText",
             "scrollPage",
             "captureScreenshot",
-            "extractText",
             "waitForElement",
         ]
         programs = "\n\n".join(
@@ -90,14 +90,14 @@ class ActionAgent:
             if event["log"] == "observe":
                 currentUrl = event["currentUrl"]
                 workspace = event["workspace"]
-                clickables = event["clickables"]
-                text = event["text"]
+                # clickables = event["clickables"]
+                # text = event["text"]
             elif event["log"] == "error":
                 error_messages.append(event["error"])
             else:
                 chat_messages.append(event["log"])
 
-        if not currentUrl or not workspace or not clickables or not text:
+        if not currentUrl or not workspace:
             raise ValueError("Missing information in events")
 
         observation = ""
@@ -125,9 +125,9 @@ class ActionAgent:
 
         observation += f"Workspace: {', '.join(workspace)}\n\n"
 
-        observation += f"Clickables: {clickables}\n\n"
+        # observation += f"Clickables: {clickables}\n\n"
 
-        observation += f"Text: {text}\n\n"
+        # observation += f"Text: {text}\n\n"
 
         observation += f"Task: {task}\n\n"
 

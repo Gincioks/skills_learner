@@ -1,5 +1,5 @@
 async function searchGoogle(query) {
-    await navigateToGoogle();
+    await navigateToURL("https://google.com");
     await typeText("#APjFqb", query);
     await page.keyboard.press("Enter");
     await page.waitForSelector("div[id=result-stats]");

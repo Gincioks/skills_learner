@@ -34,8 +34,8 @@ class CriticAgent:
         event = events[-1]
         current_url = event["currentUrl"]
         workspace = event["workspace"]
-        clickables = event["clickables"]
-        text = event["text"]
+        # clickables = event["clickables"]
+        # text = event["text"]
 
         for i, (event) in enumerate(events):
             if event["log"] == "error":
@@ -45,16 +45,16 @@ class CriticAgent:
 
         observation = ""
 
-        if not current_url or not workspace or not clickables or not text:
+        if not current_url or not workspace:
             raise ValueError("Missing required fields")
 
         observation += f"URL: {current_url}\n\n"
 
         observation += f"Workspace: {workspace}\n\n"
 
-        observation += f"Clickables: {clickables}\n\n"
+        # observation += f"Clickables: {clickables}\n\n"
 
-        observation += f"Text: {text}\n\n"
+        # observation += f"Text: {text}\n\n"
 
         observation += f"Task: {task}\n\n"
 

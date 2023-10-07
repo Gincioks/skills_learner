@@ -22,7 +22,7 @@ class VoyagerEnv(gym.Env):
         server_port=3000,
         request_timeout=600,
         log_path="./logs",
-    ):  
+    ):
         self.server = f"{server_host}:{server_port}"
         self.server_port = server_port
         self.request_timeout = request_timeout
@@ -79,10 +79,10 @@ class VoyagerEnv(gym.Env):
         self,
         *,
         options: ResetOptions = {
-            "clickables": {},
+            # "clickables": {},
             "currentUrl": "",
             "workspace": [],
-            "text": ""
+            # "text": ""
         },
     ):
 
