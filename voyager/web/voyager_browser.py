@@ -173,6 +173,7 @@ class VoyagerBrowser:
             (self.messages[0].content,
              self.messages[1].content, ai_message.content)
         )
+        print(ai_message, "messssssssss---------------------")
         parsed_result = self.action_agent.process_ai_message(
             message=ai_message)
         success = False

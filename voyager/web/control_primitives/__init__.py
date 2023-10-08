@@ -4,7 +4,7 @@ import voyager.utils as U
 
 
 def load_control_primitives(primitive_names=None):
-    package_path = pkg_resources.resource_filename("voyager", "")
+    package_path = pkg_resources.resource_filename("voyager", "web")
     if primitive_names is None:
         primitive_names = [
             primitives[:-3]

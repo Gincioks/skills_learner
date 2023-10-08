@@ -10,7 +10,7 @@ def load_control_primitives_context(primitive_names=None):
         primitive_names = [
             primitive[:-3]
             for primitive in os.listdir(f"{package_path}/control_primitives_context")
-            if primitive.endswith(".py")
+            if primitive.endswith(".py") and primitive != "__init__.py"
         ]
     primitives = [
         U.load_text(

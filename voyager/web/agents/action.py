@@ -54,8 +54,6 @@ class ActionAgent:
             "writeFile",
             "readFile",
             "clickElement",
-            "executeShellScript",
-            "executePythonScript",
             "typeText",
             "scrollPage",
             "captureScreenshot",

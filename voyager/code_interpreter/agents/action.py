@@ -131,7 +131,7 @@ class ActionAgent:
 
         return HumanMessage(content=observation)
 
-    def process_ai_message(message) -> Union[ProposedProgram, Exception, str]:
+    def process_ai_message(self, message) -> Union[ProposedProgram, Exception, str]:
         assert isinstance(message, AIMessage)
 
         retry = 3
@@ -142,6 +142,7 @@ class ActionAgent:
                     r"```(?:python|py)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
                 parsed = ast.parse(code)
+                print(code, "parsed------------")
                 functions: List[Dict[str, Any]] = []
                 assert len(parsed.body) > 0, "No functions found"
 
@@ -163,17 +164,21 @@ class ActionAgent:
 
                 main_function = None
                 for function in reversed(functions):
-                    if function["type"] == "AsyncFunctionDef":
+                    if function["type"] == "FunctionDef":  # Changed from "AsyncFunctionDef"
                         main_function = function
                         break
 
                 if not main_function:
                     raise Exception(
-                        "No async function found. Your main function must be async.")
+                        "No function found. Your main function must be defined.")
 
                 program_code = "\n\n".join(
                     [function["body"] for function in functions])
-                exec_code = f"await {main_function['name']}();"
+                exec_code = f"{main_function['name']}():"
+
+                # print(f"Program code: {program_code}")
+                # print(f"Exec code: {exec_code}")
+                # print(f"Program name: {main_function['name']}")
 
                 return {
                     "program_code": program_code,

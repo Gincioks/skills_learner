@@ -47,21 +47,19 @@ async def execute(request: Request):
     programs = req_data.get("programs", "").replace(
         "\r\n", "").replace("\n", "").replace("\r", "")
 
+    output = "No code or programs received."
+
     print(f"Received code: {code}")
     print(f"Received programs: {programs}")
 
-    if not code and not programs:
-        print("No code or programs received.")
-        record_event("observe", "No code or programs received.")
-
     try:
         if code and programs:
-            combined_code = f"{programs}; {code}"
+            combined_code = f"{programs} {code}"
             print(f"Executing combined code: {combined_code}")
             output = exec_python(combined_code)
             print("Executed code successfully.")
             print("Recorded event.")
-            record_event("observe", output)
+        record_event("observe", output)
     except Exception as e:
         print(f"Exception: {e}")
         record_event("error", None, error=str(e))
@@ -70,6 +68,8 @@ async def execute(request: Request):
         json.dump(events_cache, f, indent=2)
 
     response = {"events": events_cache}
+    events_cache = []
+
     print(response, "kas cia")
     return response
 
