@@ -6,10 +6,10 @@ from typing import Dict, Union, List
 from langchain.schema import (
     BaseMessage
 )
-from voyager.types import BrowserEvent, ProposedProgram
+from voyager.types import BrowserEvent, ProposedProgram, PythonEvent
 
 import voyager.utils as U
-from .env import VoyagerEnv
+from .env import VoyagerEnv, VoyagerEnvPython
 
 from .agents import ActionAgent
 from .agents import CriticAgent
@@ -25,6 +25,7 @@ class Voyager:
     def __init__(
         self,
         server_port: int = 3000,
+        server_port_python: int = 3001,
         openai_api_key: str or None = "None",
         max_iterations: int = 10,
         env_request_timeout: int = 600,
@@ -80,9 +81,13 @@ class Voyager:
         :param skill_library_dir: skill library dir
         :param resume: whether to resume from checkpoint
         """
-        # init env
+        # init env's
         self.env = VoyagerEnv(
             server_port=server_port,
+            request_timeout=env_request_timeout,
+        )
+        self.env_python = VoyagerEnvPython(
+            server_port=server_port_python,
             request_timeout=env_request_timeout,
         )
         self.reset_placed_if_failed = reset_placed_if_failed
@@ -134,7 +139,7 @@ class Voyager:
         self.context = ""
         self.messages: Messages = []
         self.conversations: Conversations = []
-        self.last_events: List[BrowserEvent] = []
+        self.last_events: List[BrowserEvent | PythonEvent] = []
 
     def reset(self, task, context="", reset_env=True):
         self.action_agent_rollout_num_iter = 0

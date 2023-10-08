@@ -152,8 +152,8 @@ class CurriculumAgent:
 
     def propose_next_task(self, *, events, max_retries=5):
         if self.progress == 0 and self.mode == "auto":
-            task = "Get all information about Petals from github.com/bigscience-workshop/petals and run it on your machine."
-            context = "Petals is a python package from bigscience-workshop to run large language models at home, BitTorrent-style. Fine-tuning and inference up to 10x faster than offloading."  # noqa: E501
+            task = "find papers on LLM applications from arxiv in the last week, create a markdown table of different domains."
+            context = "Do task using python and shell, not browser"  # noqa: E501
             return task, context
 
         messages = [

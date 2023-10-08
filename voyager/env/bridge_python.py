@@ -7,11 +7,11 @@ import voyager.utils as U
 from .process_monitor import SubprocessMonitor
 
 
-class VoyagerEnv(gym.Env):
+class VoyagerEnvPython(gym.Env):
     def __init__(
         self,
-        server_host="http://127.0.0.1",
-        server_port=3000,
+        server_host="http://localhost",
+        server_port=3001,
         request_timeout=600,
         log_path="./logs",
     ):
@@ -25,17 +25,17 @@ class VoyagerEnv(gym.Env):
         # self.browser_instance = self.run(server_port)
 
     def run(self, server_port):
-        U.f_mkdir(self.log_path, "browser")
+        U.f_mkdir(self.log_path, "python")
         file_path = os.path.abspath(os.path.dirname(__file__))
         monitor = SubprocessMonitor(
             commands=[
-                "node",
-                U.f_join(file_path, "browser/index.js"),
+                "python",
+                U.f_join(file_path, "python/main.py"),
                 # TODO
                 # str(server_port),
             ],
-            name="browser",
-            log_path=U.f_join(self.log_path, "browser"),
+            name="python",
+            log_path=U.f_join(self.log_path, "python"),
         )
         monitor.run()
         return monitor
@@ -60,7 +60,7 @@ class VoyagerEnv(gym.Env):
             f"{self.server}/execute", json=data, timeout=self.request_timeout
         )
         if res.status_code != 200:
-            raise RuntimeError("Failed to execute NodeJS code")
+            raise RuntimeError("Failed to execute Python code")
         returned_data = res.json()
         return returned_data["events"]
 
@@ -71,10 +71,8 @@ class VoyagerEnv(gym.Env):
         self,
         *,
         options: ResetOptions = {
-            # "clickables": {},
-            "currentUrl": "",
             "workspace": [],
-            # "text": ""
+            "output": ""
         },
     ):
 

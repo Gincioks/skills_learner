@@ -17,6 +17,7 @@ Critique: ...
 You should then respond to me with
 Explain (if applicable): Are there any steps missing in your plan? Why does the code not complete the task? What does the chat log and execution error imply?
 Plan: How to complete the task step by step. You should pay attention to Workspace since it tells what what files we can read/write to achieve our task. The task completeness check is also based on our final workspace.
+Perform one task at time.
 Code:
     1) Write an async function.
     2) Reuse the above useful programs as much as possible.
