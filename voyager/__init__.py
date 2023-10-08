@@ -1,1 +1,1 @@
-from .voyager import Voyager
+from .browser.voyager_browser import VoyagerBrowser

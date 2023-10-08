@@ -21,7 +21,7 @@ Conversations = List[Conversation]
 Messages = List[BaseMessage]
 
 
-class Voyager:
+class VoyagerBrowser:
     def __init__(
         self,
         server_port: int = 3000,
