@@ -1,15 +1,15 @@
 import re
 import time
-from typing import List, Union
-from voyager.types import BrowserEvent, FunctionDescription, ProposedProgram
+from typing import List, Union, Dict, Any
+from voyager.code_interpreter.control_primitives_context import load_control_primitives_context
+from voyager.code_interpreter.prompts import load_prompt
+
+from voyager.types import PythonEvent, ProposedProgram
 import voyager.utils as U
-from javascript import require
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import SystemMessagePromptTemplate
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
-
-from voyager.web.prompts import load_prompt
-from voyager.web.control_primitives_context import load_control_primitives_context
+import ast
 
 
 class ActionAgent:
@@ -49,17 +49,8 @@ class ActionAgent:
 
         # FIXME: Hardcoded control_primitives
         base_skills = [
-            "navigateToURL",
-            "searchGoogle",
             "writeFile",
             "readFile",
-            "clickElement",
-            "executeShellScript",
-            "executePythonScript",
-            "typeText",
-            "scrollPage",
-            "captureScreenshot",
-            "waitForElement",
         ]
         programs = "\n\n".join(
             load_control_primitives_context(base_skills) + skills)
@@ -74,31 +65,29 @@ class ActionAgent:
         return system_message
 
     def render_human_message(
-        self, *, events: List[BrowserEvent], code="", task="", context="", critique=""
+        self, *, events: List[PythonEvent], code="", task="", context="", critique=""
     ):
         chat_messages = []
         error_messages = []
 
-        currentUrl = None
+        currentDir = None
         workspace = None
-        clickables = None
-        text = None
+        output = None
 
         if not events[-1]["log"] == "observe":
             raise ValueError("Last event must be observe")
 
         for i, (event) in enumerate(events):
             if event["log"] == "observe":
-                currentUrl = event["currentUrl"]
+                currentDir = event["currentDir"]
                 workspace = event["workspace"]
-                # clickables = event["clickables"]
-                # text = event["text"]
+                output = event["output"]
             elif event["log"] == "error":
                 error_messages.append(event["error"])
             else:
                 chat_messages.append(event["log"])
 
-        if not currentUrl or not workspace:
+        if not currentDir or not workspace or not output:
             raise ValueError("Missing information in events")
 
         observation = ""
@@ -122,13 +111,11 @@ class ActionAgent:
             else:
                 observation += f"Chat log: None\n\n"
 
-        observation += f"Current URL: {currentUrl}\n\n"
+        observation += f"Current Dir: {currentDir}\n\n"
 
         observation += f"Workspace: {', '.join(workspace)}\n\n"
 
-        # observation += f"Clickables: {clickables}\n\n"
-
-        # observation += f"Text: {text}\n\n"
+        observation += f"Output: {output}\n\n"
 
         observation += f"Task: {task}\n\n"
 
@@ -144,43 +131,39 @@ class ActionAgent:
 
         return HumanMessage(content=observation)
 
-    def process_ai_message(self, message) -> Union[ProposedProgram, Exception, str]:
+    def process_ai_message(message) -> Union[ProposedProgram, Exception, str]:
         assert isinstance(message, AIMessage)
 
         retry = 3
         error = None
         while retry > 0:
             try:
-                babel = require("@babel/core")
-                babel_generator = require("@babel/generator").default
-
                 code_pattern = re.compile(
-                    r"```(?:javascript|js)(.*?)```", re.DOTALL)
+                    r"```(?:python|py)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
-                parsed = babel.parse(code)
-                functions: List[FunctionDescription] = []
-                assert len(list(parsed.program.body)) > 0, "No functions found"
-                for i, node in enumerate(parsed.program.body):
-                    if node.type != "FunctionDeclaration":
-                        continue
-                    node_type = (
-                        "AsyncFunctionDeclaration"
-                        if node["async"]
-                        else "FunctionDeclaration"
-                    )
-                    functions.append(
-                        {
-                            "name": node.id.name,
-                            "type": node_type,
-                            "body": babel_generator(node).code,
-                            "params": list(node["params"]),
-                        }
-                    )
-                # find the last async function
-                main_function: Union[None, FunctionDescription] = None
+                parsed = ast.parse(code)
+                functions: List[Dict[str, Any]] = []
+                assert len(parsed.body) > 0, "No functions found"
 
+                for node in parsed.body:
+                    if not isinstance(node, ast.FunctionDef):
+                        continue
+
+                    node_type = (
+                        "AsyncFunctionDef" if isinstance(
+                            node, ast.AsyncFunctionDef) else "FunctionDef"
+                    )
+
+                    functions.append({
+                        "name": node.name,
+                        "type": node_type,
+                        "body": ast.dump(node),
+                        "params": [arg.arg for arg in node.args.args]
+                    })
+
+                main_function = None
                 for function in reversed(functions):
-                    if function["type"] == "AsyncFunctionDeclaration":
+                    if function["type"] == "AsyncFunctionDef":
                         main_function = function
                         break
 
@@ -189,17 +172,20 @@ class ActionAgent:
                         "No async function found. Your main function must be async.")
 
                 program_code = "\n\n".join(
-                    function["body"] for function in functions)
+                    [function["body"] for function in functions])
                 exec_code = f"await {main_function['name']}();"
+
                 return {
                     "program_code": program_code,
                     "program_name": main_function["name"],
-                    "exec_code": exec_code,
+                    "exec_code": exec_code
                 }
+
             except Exception as e:
                 retry -= 1
                 error = e
                 time.sleep(1)
+
         return f"Error parsing action response (before program execution): {error}"
 
     # def summarize_chatlog(self, events):

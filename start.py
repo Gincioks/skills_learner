@@ -1,8 +1,13 @@
-from voyager import VoyagerBrowser
+from voyager import VoyagerBrowser, VoyagerPython
+
 
 openai_api_key = "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"
 
-voyager = VoyagerBrowser(
+# voyager = VoyagerBrowser(
+#     openai_api_key=openai_api_key,
+# )
+
+voyager = VoyagerPython(
     openai_api_key=openai_api_key,
 )
 

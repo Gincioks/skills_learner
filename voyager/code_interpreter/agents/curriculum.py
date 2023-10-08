@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import re
 from typing import List
-from voyager.types import BrowserEvent
+from voyager.code_interpreter.prompts import load_prompt
+from voyager.types import PythonEvent
 
 import voyager.utils as U
-from voyager.web.prompts import load_prompt
 from voyager.utils.json_utils import fix_and_parse_json
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -75,10 +75,9 @@ class CurriculumAgent:
     def curriculum_observations(self):
         return [
             "context",
-            "current_url",
-            # "clickables",
+            "current_dir",
             "workspace",
-            # "text",
+            "output",
             "completed_tasks",
             "failed_tasks",
         ]
@@ -92,15 +91,14 @@ class CurriculumAgent:
         assert isinstance(system_message, SystemMessage)
         return system_message
 
-    def render_observation(self, *, events: List[BrowserEvent]):
+    def render_observation(self, *, events: List[PythonEvent]):
         if events[-1]["log"] != "observe":
             raise AssertionError("Last event must be observe")
 
         event = events[-1]
-        current_url = event["currentUrl"]
-        # clickables = event["clickables"]
+        current_dir = event["currentDir"]
         workspace = event["workspace"]
-        # text = event["text"]
+        output = event["output"]
 
         completed_tasks = (
             ", ".join(self.completed_tasks) if self.completed_tasks else "None"
@@ -114,10 +112,9 @@ class CurriculumAgent:
 
         observation = {
             "context": "",
-            "current_url": f"Current URL: {current_url}\n\n",
-            # "clickables": f"Clickables: {clickables}\n\n",
+            "current_url": f"Current Dir: {current_dir}\n\n",
             "workspace": f"Workspace: {workspace}\n\n",
-            # "text": f"Text: {text}\n\n",
+            "output": f"Text: {output}\n\n",
             "completed_tasks": f"Completed tasks so far: {completed_tasks}\n\n",
             "failed_tasks": f"Failed tasks that are too hard: {failed_tasks}\n\n",
         }
@@ -151,8 +148,8 @@ class CurriculumAgent:
 
     def propose_next_task(self, *, events, max_retries=5):
         if self.progress == 0 and self.mode == "auto":
-            task = "Get all information about Petals from github.com/bigscience-workshop/petals and run it on your machine."
-            context = "Petals is a python package from bigscience-workshop to run large language models at home, BitTorrent-style. Fine-tuning and inference up to 10x faster than offloading."  # noqa: E501
+            task = "find papers on LLM applications from arxiv in the last week, create a markdown table of different domains."
+            context = ""  # noqa: E501
             return task, context
 
         messages = [

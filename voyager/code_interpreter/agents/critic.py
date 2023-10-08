@@ -1,6 +1,6 @@
 from typing import List
-from voyager.types import BrowserEvent
-from voyager.web.prompts import load_prompt
+from voyager.code_interpreter.prompts import load_prompt
+from voyager.types import PythonEvent
 from voyager.utils.json_utils import fix_and_parse_json
 from langchain.chat_models import ChatOpenAI
 from langchain.schema import HumanMessage, SystemMessage
@@ -26,16 +26,15 @@ class CriticAgent:
         system_message = SystemMessage(content=load_prompt("critic"))
         return system_message
 
-    def render_human_message(self, *, events: List[BrowserEvent], task, context):
+    def render_human_message(self, *, events: List[PythonEvent], task, context):
 
         if not events[-1]["log"] == "observe":
             raise ValueError("Last event must be an observe event")
 
         event = events[-1]
-        current_url = event["currentUrl"]
+        current_dir = event["currentDir"]
         workspace = event["workspace"]
-        # clickables = event["clickables"]
-        # text = event["text"]
+        output = event["output"]
 
         for i, (event) in enumerate(events):
             if event["log"] == "error":
@@ -45,16 +44,14 @@ class CriticAgent:
 
         observation = ""
 
-        if not current_url or not workspace:
+        if not current_dir or not workspace or not output:
             raise ValueError("Missing required fields")
 
-        observation += f"URL: {current_url}\n\n"
+        observation += f"Current Dir: {current_dir}\n\n"
 
         observation += f"Workspace: {workspace}\n\n"
 
-        # observation += f"Clickables: {clickables}\n\n"
-
-        # observation += f"Text: {text}\n\n"
+        observation += f"Output: {output}\n\n"
 
         observation += f"Task: {task}\n\n"
 

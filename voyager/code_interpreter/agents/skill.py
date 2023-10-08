@@ -1,13 +1,12 @@
 import os
+from voyager.code_interpreter.control_primitives import load_control_primitives
+from voyager.code_interpreter.prompts import load_prompt
 
 import voyager.utils as U
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.vectorstores import Chroma
-
-from voyager.web.prompts import load_prompt
-from voyager.web.control_primitives import load_control_primitives
 
 
 class SkillManager:
@@ -108,8 +107,8 @@ class SkillManager:
                 + f"The main function is `{program_name}`."
             ),
         ]
-        skill_description = f"    // { self.llm(messages).content}"
-        return f"async function {program_name}() {{\n{skill_description}\n}}"
+        skill_description = f"    # { self.llm(messages).content}"
+        return f"async def {program_name}():\n{skill_description}\n"
 
     def retrieve_skills(self, query):
         k = min(self.vectordb._collection.count(), self.retrieval_top_k)
