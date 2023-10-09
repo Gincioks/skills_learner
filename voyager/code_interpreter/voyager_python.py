@@ -170,6 +170,8 @@ class VoyagerPython:
                 max_retries=5,
             )
 
+            print(f"\033[34m{success}\033[0m", "success")
+
             new_skills = self.skill_manager.retrieve_skills(
                 query=self.context
             )

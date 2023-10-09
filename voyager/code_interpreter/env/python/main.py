@@ -24,11 +24,10 @@ def exec_python(code):
         os.remove(temp_file_name)
 
         return result.stdout
-
     except subprocess.CalledProcessError as e:
         return f"Execution failed: {e.stderr}"
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        return f"Execution failed: {str(e)}"
 
 
 def get_current_dir():
@@ -61,15 +60,16 @@ async def execute(request: Request):
     try:
         if code and programs:
             combined_code = f"{programs}{code}"
-            # add combined code to async main function launch function
             output = exec_python(combined_code)
-            print(output, "-------------------output----------------")
-            record_event("observe", "Code was executed")
+            if output == "":
+                record_event("observe", "Code was executed successfully")
+            else:
+                record_event("observe", output)
         else:
             record_event("observe", "No code or program was executed")
     except Exception as e:
         print(f"Exception: {e}")
-        record_event("error", None, error=str(e))
+        record_event("error", "Error", error=str(e))
 
     with open("./workspace/events.json", "w") as f:
         json.dump(events_cache, f, indent=2)

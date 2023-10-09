@@ -9,6 +9,7 @@ openai_api_key = "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"
 
 voyager = VoyagerPython(
     openai_api_key=openai_api_key,
+    critic_agent_mode="auto"
 )
 
 # start lifelong learning

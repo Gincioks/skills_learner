@@ -141,41 +141,9 @@ class ActionAgent:
                 code_pattern = re.compile(
                     r"```(?:python|py)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
-                # parsed = ast.parse(code)
-                # functions: List[Dict[str, Any]] = []
-                # assert len(parsed.body) > 0, "No functions found"
-
-                # for node in parsed.body:
-                #     if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                #         continue
-
-                #     node_type = (
-                #         "AsyncFunctionDef" if isinstance(
-                #             node, ast.AsyncFunctionDef) else "FunctionDef"
-                #     )
-
-                #     functions.append({
-                #         "name": node.name,
-                #         "type": node_type,
-                #         "body": ast.dump(node),
-                #         "params": [arg.arg for arg in node.args.args]
-                #     })
-
-                # main_function = None
-                # for function in reversed(functions):
-                #     if function["name"] == "main":
-                #         print(function["name"], "function name")
-                #         print(function["type"], "function type")
-                #         main_function = function
-                #     break
-
-                # if not main_function:
-                #     raise Exception(
-                #         "No function found. Your main function must be defined.")
 
                 return {
                     "program_code": code,
-                    # "program_name": main_function["name"],
                 }
 
             except Exception as e:
@@ -185,20 +153,6 @@ class ActionAgent:
 
         return f"Error parsing action response (before program execution): {error}"
 
-    def ensure_main_function_execution(self, code: str, main_function_name: str, is_async: bool) -> str:
-        # Pattern to match the execution of the main_function_name
-        pattern = re.compile(
-            f'{re.escape(main_function_name)}\s*\(\s*\)', re.MULTILINE)
-
-        # Search for the pattern in the code
-        if not pattern.search(code):
-            # If the pattern is not found, append the execution line to the code
-            if is_async:
-                code += f'\nasyncio.run({main_function_name}())'
-            else:
-                code += f'\n{main_function_name}()'
-
-        return code
     # def summarize_chatlog(self, events):
     #     def filter_item(message: str):
     #         craft_pattern = r"I cannot make \w+ because I need: (.*)"
