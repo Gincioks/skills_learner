@@ -146,10 +146,8 @@ class CurriculumAgent:
             f"\033[35m****Curriculum Agent human message****\n{content}\033[0m")
         return HumanMessage(content=content)
 
-    def propose_next_task(self, *, events, max_retries=5):
+    def propose_next_task(self, *, events, max_retries=5, task=None, context=None):
         if self.progress == 0 and self.mode == "auto":
-            task = "find papers on LLM applications from arxiv in the last week, create a markdown table of different domains."
-            context = ""  # noqa: E501
             return task, context
 
         messages = [

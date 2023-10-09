@@ -13,4 +13,7 @@ voyager = VoyagerPython(
 )
 
 # start lifelong learning
-voyager.learn()
+voyager.learn(
+    init_task="find papers on LLM applications from arxiv in the last week, create a markdown table of different domains and save to file",
+    init_context="Use arxiv python packpage"  # noqa: E501"
+)

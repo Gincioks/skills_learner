@@ -226,7 +226,7 @@ class VoyagerPython:
                 break
         return messages, reward, done, info
 
-    def learn(self, reset_env=True):
+    def learn(self, init_task: str, init_context: str, reset_env=True):
         self.env.reset()
         self.last_events = self.env.step("")
         while True:
@@ -236,6 +236,8 @@ class VoyagerPython:
             task, context = self.curriculum_agent.propose_next_task(
                 events=self.last_events,
                 max_retries=5,
+                task=init_task,
+                context=init_context,
             )
             print(
                 f"\033[35mStarting task {task} for at most {self.action_agent_task_max_retries} times\033[0m"
