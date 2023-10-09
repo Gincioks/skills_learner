@@ -157,7 +157,7 @@ class VoyagerPython:
             raise ValueError("Task must be set before stepping")
 
         if isinstance(parsed_result, dict):
-            code = parsed_result["program_code"] + parsed_result["exec_code"]
+            code = parsed_result["program_code"]
             events = self.env.step(
                 code,
                 programs=self.skill_manager.programs,

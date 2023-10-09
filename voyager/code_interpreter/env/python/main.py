@@ -1,21 +1,34 @@
 from fastapi import FastAPI, Request
 import json
 import os
-from IPython import get_ipython
+import subprocess
+import tempfile
+
 
 app = FastAPI()
 events_cache = []
 
 
-def exec_python(cell):
-    ipython = get_ipython()
-    result = ipython.run_cell(cell)
-    log = str(result.result)
-    if result.error_before_exec is not None:
-        log += f"\n{result.error_before_exec}"
-    if result.error_in_exec is not None:
-        log += f"\n{result.error_in_exec}"
-    return log
+def exec_python(code):
+    try:
+       # save code to temporary file
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".py") as f:
+            f.write(code)
+            temp_file_name = f.name
+
+        # execute code
+        result = subprocess.run(
+            ["python", temp_file_name], text=True, capture_output=True, check=True)
+
+        # delete temporary file
+        os.remove(temp_file_name)
+
+        return result.stdout
+
+    except subprocess.CalledProcessError as e:
+        return f"Execution failed: {e.stderr}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
 
 
 def get_current_dir():
@@ -42,24 +55,18 @@ def record_event(log, output=None, error=None):
 async def execute(request: Request):
     global events_cache
     req_data = await request.json()
-    code = req_data.get("code", "").replace(
-        "\r\n", "").replace("\n", "").replace("\r", "")
-    programs = req_data.get("programs", "").replace(
-        "\r\n", "").replace("\n", "").replace("\r", "")
-
-    output = "No code or programs received."
-
-    print(f"Received code: {code}")
-    print(f"Received programs: {programs}")
+    code = req_data.get("code", "")
+    programs = req_data.get("programs", "")
 
     try:
         if code and programs:
-            combined_code = f"{programs} {code}"
-            print(f"Executing combined code: {combined_code}")
+            combined_code = f"{programs}{code}"
+            # add combined code to async main function launch function
             output = exec_python(combined_code)
-            print("Executed code successfully.")
-            print("Recorded event.")
-        record_event("observe", output)
+            print(output, "-------------------output----------------")
+            record_event("observe", "Code was executed")
+        else:
+            record_event("observe", "No code or program was executed")
     except Exception as e:
         print(f"Exception: {e}")
         record_event("error", None, error=str(e))
@@ -70,7 +77,6 @@ async def execute(request: Request):
     response = {"events": events_cache}
     events_cache = []
 
-    print(response, "kas cia")
     return response
 
 if __name__ == "__main__":

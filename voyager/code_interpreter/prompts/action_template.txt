@@ -28,6 +28,7 @@ Code:
   6) Use `await asyncio.sleep(0)` to show intermediate progress.
   7) Do not write infinite loops or recursive functions.
   8) Name your function in a meaningful way (the task should be inferable from the name).
+  9) Always call your function in the end of file, if function async use `asyncio.run()`.
 
 RESPONSE FORMAT:
 {response_format}

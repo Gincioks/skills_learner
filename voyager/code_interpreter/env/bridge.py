@@ -57,6 +57,8 @@ class VoyagerEnvPython(gym.Env):
             "programs": programs,
         }
 
+        print(data, "data---------------------------------")
+
         res = requests.post(
             f"{self.server}/execute", json=data, timeout=self.request_timeout
         )
