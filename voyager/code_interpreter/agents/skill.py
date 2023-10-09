@@ -71,7 +71,7 @@ class SkillManager:
                 f"\033[33mSkill {program_name} already exists. Rewriting!\033[0m")
             self.vectordb._collection.delete(ids=[program_name])
             i = 2
-            while f"{program_name}V{i}.js" in os.listdir(f"{self.ckpt_dir}/skill/code"):
+            while f"{program_name}V{i}.py" in os.listdir(f"{self.ckpt_dir}/skill/code"):
                 i += 1
             dumped_program_name = f"{program_name}V{i}"
         else:
@@ -89,7 +89,7 @@ class SkillManager:
             self.skills
         ), "vectordb is not synced with skills.json"
         U.dump_text(
-            program_code, f"{self.ckpt_dir}/skill/code/{dumped_program_name}.js"
+            program_code, f"{self.ckpt_dir}/skill/code/{dumped_program_name}.py"
         )
         U.dump_text(
             skill_description,
@@ -107,8 +107,8 @@ class SkillManager:
                 + f"The main function is `{program_name}`."
             ),
         ]
-        skill_description = f"    # { self.llm(messages).content}"
-        return f"async def {program_name}():\n{skill_description}\n"
+        skill_description = f"# { self.llm(messages).content}"
+        return f"{skill_description}\nasync def {program_name}():"
 
     def retrieve_skills(self, query):
         k = min(self.vectordb._collection.count(), self.retrieval_top_k)

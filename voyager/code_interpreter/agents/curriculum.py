@@ -112,7 +112,7 @@ class CurriculumAgent:
 
         observation = {
             "context": "",
-            "current_url": f"Current Dir: {current_dir}\n\n",
+            "current_dir": f"Current Dir: {current_dir}\n\n",
             "workspace": f"Workspace: {workspace}\n\n",
             "output": f"Text: {output}\n\n",
             "completed_tasks": f"Completed tasks so far: {completed_tasks}\n\n",
@@ -322,11 +322,12 @@ class CurriculumAgent:
         return HumanMessage(content=content)
 
     def run_qa_step1_ask_questions(self, *, events):
-        current_url = events[-1]["currentUrl"]
+        workspace = events[-1]["workspace"]
         questions = [
-            f"What can I do with {current_url}?",
+            f"What can I do with {workspace}?",
+            "What should I learn next?",
         ]
-        concepts = [current_url]
+        concepts = [workspace, workspace]
         messages = [
             self.render_system_message_qa_step1_ask_questions(),
             self.render_human_message_qa_step1_ask_questions(

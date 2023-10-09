@@ -4,7 +4,7 @@ from typing import List, Union, Dict, Any
 from voyager.code_interpreter.control_primitives_context import load_control_primitives_context
 from voyager.code_interpreter.prompts import load_prompt
 
-from voyager.types import PythonEvent, ProposedProgram
+from voyager.types import ProposedProgramPython, PythonEvent
 import voyager.utils as U
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import SystemMessagePromptTemplate
@@ -131,7 +131,7 @@ class ActionAgent:
 
         return HumanMessage(content=observation)
 
-    def process_ai_message(self, message) -> Union[ProposedProgram, Exception, str]:
+    def process_ai_message(self, message) -> Union[ProposedProgramPython, Exception, str]:
         assert isinstance(message, AIMessage)
 
         retry = 3
@@ -140,10 +140,48 @@ class ActionAgent:
             try:
                 code_pattern = re.compile(
                     r"```(?:python|py)(.*?)```", re.DOTALL)
+                imports_patern = re.compile(
+                    r"```(?:imports)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
+                imports = "\n".join(imports_patern.findall(message.content))
+                parsed = ast.parse(code)
+                functions: List[Dict[str, Any]] = []
+                assert len(parsed.body) > 0, "No functions found"
+
+                for node in parsed.body:
+                    if not isinstance(node, (ast.AsyncFunctionDef)):
+                        continue
+
+                    node_type = (
+                        "AsyncFunctionDef" if isinstance(
+                            node, ast.AsyncFunctionDef) else "FunctionDef"
+                    )
+
+                    functions.append({
+                        "name": node.name,
+                        "type": node_type,
+                        "body": ast.dump(node),
+                        "params": [arg.arg for arg in node.args.args]
+                    })
+
+                main_function = None
+                for function in reversed(functions):
+                    if function["type"] == "AsyncFunctionDef":
+                        if function["name"] == "main":
+                            raise Exception(
+                                "Your main function name cannot be 'main'.")
+                        main_function = function
+                    break
+
+                if not main_function:
+                    raise Exception(
+                        "No function found. Your main function must be defined.")
 
                 return {
+                    "imports": imports,
                     "program_code": code,
+                    "program_name": main_function["name"],
+                    "exec_code": f"asyncio.run({main_function['name']}())"
                 }
 
             except Exception as e:

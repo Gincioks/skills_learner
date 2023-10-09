@@ -54,12 +54,17 @@ def record_event(log, output=None, error=None):
 async def execute(request: Request):
     global events_cache
     req_data = await request.json()
+    imports = req_data.get("imports", "")
     code = req_data.get("code", "")
     programs = req_data.get("programs", "")
 
+    if "asyncio" not in imports:
+        imports = "import asyncio" + imports
+
     try:
         if code and programs:
-            combined_code = f"{programs}{code}"
+            combined_code = f"{imports}\n{programs}{code}"
+            print(f"combined_code:\n{combined_code}")
             output = exec_python(combined_code)
             if output == "":
                 record_event("observe", "Code was executed successfully")

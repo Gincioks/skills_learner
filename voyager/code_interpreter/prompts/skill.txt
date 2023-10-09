@@ -13,7 +13,7 @@ You are a helpful assistant that writes a description of the given function writ
 If the function is:
 
 ```python
-def calculate_sum(a, b):
+async def calculate_sum(a, b):
     result = a + b
     return result
 ```

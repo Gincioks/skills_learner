@@ -14,6 +14,12 @@ class ProposedProgram(TypedDict):
     exec_code: str
 
 
+class ProposedProgramPython(TypedDict):
+    imports: str
+    program_code: str
+    program_name: str
+
+
 class Clickable(TypedDict):
     id: str
     type: str
