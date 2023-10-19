@@ -18,6 +18,8 @@ class CriticAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            # openai_api_base="http://localhost:8000/v1",
+            # max_tokens=4096,
         )
         assert mode in ["auto", "manual"]
         self.mode = mode
@@ -35,6 +37,7 @@ class CriticAgent:
         current_dir = event["currentDir"]
         workspace = event["workspace"]
         output = event["output"]
+        error = event["error"]
 
         for i, (event) in enumerate(events):
             if event["log"] == "error":
@@ -51,7 +54,11 @@ class CriticAgent:
 
         observation += f"Workspace: {workspace}\n\n"
 
-        observation += f"Output: {output}\n\n"
+        if error:
+            # error = "\n".join(error_messages)
+            observation += f"Execution error:\n{error}\n\n"
+        else:
+            observation += f"Output: {output}\n\n"
 
         observation += f"Task: {task}\n\n"
 

@@ -11,8 +11,15 @@ Imports:
 ...
 Code:
 ```python
-# main function with meaningful name (only one)
-async def your_main_function_name():
-    # helper functions (only if needed, try to avoid them)
+# helper functions (only if needed, try to avoid them)
+# ...
+# function with meaningful name
+async def your_function_name():
     # ...
+```
+...
+Execution:
+```execute
+# execute your function here
+asyncio.run(your_function_name())
 ```

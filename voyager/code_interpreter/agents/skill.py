@@ -23,6 +23,8 @@ class SkillManager:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            # openai_api_base="http://localhost:8000/v1",
+            # max_tokens=4096,
         )
         U.f_mkdir(f"{ckpt_dir}/skill/code")
         U.f_mkdir(f"{ckpt_dir}/skill/description")

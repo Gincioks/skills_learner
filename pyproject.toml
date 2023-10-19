@@ -31,6 +31,7 @@ ignore = [
     "F401",
     "F403",
     "C901",
+    "W292",
 ]
 # Exclude a variety of commonly ignored directories.
 exclude = [

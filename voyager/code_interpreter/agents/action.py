@@ -1,6 +1,8 @@
 import re
 import time
 from typing import List, Union, Dict, Any
+
+import openai
 from voyager.code_interpreter.control_primitives_context import load_control_primitives_context
 from voyager.code_interpreter.prompts import load_prompt
 
@@ -17,7 +19,7 @@ class ActionAgent:
         self,
         model_name: str = "gpt-3.5-turbo",
         temperature: float = 0,
-        request_timout: int = 120,
+        request_timout: int = 220,
         ckpt_dir: str = "ckpt",
         resume: bool = False,
         chat_log: bool = True,
@@ -39,6 +41,8 @@ class ActionAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
+            # openai_api_base="http://localhost:8000/v1",
+            # max_tokens=4096,
         )
 
     def render_system_message(self, skills=[]):
@@ -51,6 +55,8 @@ class ActionAgent:
         base_skills = [
             "writeFile",
             "readFile",
+            "fetchData",
+            "installPackage",
         ]
         programs = "\n\n".join(
             load_control_primitives_context(base_skills) + skills)
@@ -73,6 +79,7 @@ class ActionAgent:
         currentDir = None
         workspace = None
         output = None
+        error = None
 
         if not events[-1]["log"] == "observe":
             raise ValueError("Last event must be observe")
@@ -82,12 +89,13 @@ class ActionAgent:
                 currentDir = event["currentDir"]
                 workspace = event["workspace"]
                 output = event["output"]
+                error = event["error"]
             elif event["log"] == "error":
                 error_messages.append(event["error"])
             else:
                 chat_messages.append(event["log"])
 
-        if not currentDir or not workspace or not output:
+        if not currentDir or not workspace:
             raise ValueError("Missing information in events")
 
         observation = ""
@@ -98,9 +106,9 @@ class ActionAgent:
             observation += f"Code from the last round: No code in the first round\n\n"
 
         if self.execution_error:
-            if error_messages:
+            if error:
                 # error = "\n".join(error_messages)
-                observation += f"Execution error:\n{error_messages}\n\n"
+                observation += f"Execution error:\n{error}\n\n"
             else:
                 observation += f"Execution error: No error\n\n"
 
@@ -115,7 +123,8 @@ class ActionAgent:
 
         observation += f"Workspace: {', '.join(workspace)}\n\n"
 
-        observation += f"Output: {output}\n\n"
+        if not error:
+            observation += f"Output: {output}\n\n"
 
         observation += f"Task: {task}\n\n"
 
@@ -142,8 +151,11 @@ class ActionAgent:
                     r"```(?:python|py)(.*?)```", re.DOTALL)
                 imports_patern = re.compile(
                     r"```(?:imports)(.*?)```", re.DOTALL)
+                execute_patern = re.compile(
+                    r"```(?:execute)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
                 imports = "\n".join(imports_patern.findall(message.content))
+                execute = "\n".join(execute_patern.findall(message.content))
                 parsed = ast.parse(code)
                 functions: List[Dict[str, Any]] = []
                 assert len(parsed.body) > 0, "No functions found"
@@ -181,7 +193,7 @@ class ActionAgent:
                     "imports": imports,
                     "program_code": code,
                     "program_name": main_function["name"],
-                    "exec_code": f"asyncio.run({main_function['name']}())"
+                    "exec_code": execute
                 }
 
             except Exception as e:

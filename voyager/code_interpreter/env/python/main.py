@@ -3,6 +3,7 @@ import json
 import os
 import subprocess
 import tempfile
+import llama_cpp.server
 
 
 app = FastAPI()
@@ -23,11 +24,20 @@ def exec_python(code):
         # delete temporary file
         os.remove(temp_file_name)
 
-        return result.stdout
+        return {
+            "is_executed": True,
+            "output": f"{result.stdout}"
+        }
     except subprocess.CalledProcessError as e:
-        return f"Execution failed: {e.stderr}"
+        return {
+            "is_executed": False,
+            "output": f"{e.stderr}"
+        }
     except Exception as e:
-        return f"Execution failed: {str(e)}"
+        return {
+            "is_executed": False,
+            "output": f"{str(e)}"
+        }
 
 
 def get_current_dir():
@@ -65,11 +75,16 @@ async def execute(request: Request):
         if code and programs:
             combined_code = f"{imports}\n{programs}{code}"
             print(f"combined_code:\n{combined_code}")
-            output = exec_python(combined_code)
-            if output == "":
-                record_event("observe", "Code was executed successfully")
+            execution = exec_python(combined_code)
+            if execution["is_executed"]:
+                if execution["output"] == "":
+                    record_event(
+                        "observe", "Code was executed successfully, but not printed anything.")
+                else:
+                    record_event("observe", execution["output"])
             else:
-                record_event("observe", output)
+                record_event("observe", "Code was not executed successfully",
+                             error=execution["output"])
         else:
             record_event("observe", "No code or program was executed")
     except Exception as e:
