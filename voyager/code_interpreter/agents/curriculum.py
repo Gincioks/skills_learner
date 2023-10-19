@@ -17,7 +17,7 @@ class CurriculumAgent:
     def __init__(
         self,
         model_name: str = "gpt-4",
-        temperature: float = 0,
+        temperature: float = 0.2,
         qa_model_name: str = "gpt-4",
         qa_temperature: float = 0.5,
         request_timout: int = 120,
@@ -29,8 +29,8 @@ class CurriculumAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            # openai_api_base="http://localhost:8000/v1",
-            # max_tokens=4096,
+            openai_api_base="http://localhost:8000/v1",
+            max_tokens=8192,
         )
         self.qa_llm = ChatOpenAI(
             model_name=qa_model_name,

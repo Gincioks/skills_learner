@@ -18,7 +18,7 @@ class ActionAgent:
     def __init__(
         self,
         model_name: str = "gpt-3.5-turbo",
-        temperature: float = 0,
+        temperature: float = 0.2,
         request_timout: int = 220,
         ckpt_dir: str = "ckpt",
         resume: bool = False,
@@ -41,8 +41,8 @@ class ActionAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            # openai_api_base="http://localhost:8000/v1",
-            # max_tokens=4096,
+            openai_api_base="http://localhost:8000/v1",
+            max_tokens=8192,
         )
 
     def render_system_message(self, skills=[]):
@@ -95,7 +95,7 @@ class ActionAgent:
             else:
                 chat_messages.append(event["log"])
 
-        if not currentDir or not workspace:
+        if not currentDir:
             raise ValueError("Missing information in events")
 
         observation = ""
@@ -121,7 +121,10 @@ class ActionAgent:
 
         observation += f"Current Dir: {currentDir}\n\n"
 
-        observation += f"Workspace: {', '.join(workspace)}\n\n"
+        if workspace:
+            observation += f"Workspace: {', '.join(workspace)}\n\n"
+        else:
+            observation += f"Workspace: None\n\n"
 
         if not error:
             observation += f"Output: {output}\n\n"
@@ -149,12 +152,9 @@ class ActionAgent:
             try:
                 code_pattern = re.compile(
                     r"```(?:python|py)(.*?)```", re.DOTALL)
-                imports_patern = re.compile(
-                    r"```(?:imports)(.*?)```", re.DOTALL)
                 execute_patern = re.compile(
                     r"```(?:execute)(.*?)```", re.DOTALL)
                 code = "\n".join(code_pattern.findall(message.content))
-                imports = "\n".join(imports_patern.findall(message.content))
                 execute = "\n".join(execute_patern.findall(message.content))
                 parsed = ast.parse(code)
                 functions: List[Dict[str, Any]] = []
@@ -190,7 +190,6 @@ class ActionAgent:
                         "No function found. Your main function must be defined.")
 
                 return {
-                    "imports": imports,
                     "program_code": code,
                     "program_name": main_function["name"],
                     "exec_code": execute

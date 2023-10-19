@@ -1,4 +1,4 @@
-def fetch_data(url):
-    response = requests.get(url)
+def fetch_data(url, params):
+    response = requests.get(url, params)
     data = response.json()
     return data

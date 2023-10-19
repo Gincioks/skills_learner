@@ -15,7 +15,6 @@ class ProposedProgram(TypedDict):
 
 
 class ProposedProgramPython(TypedDict):
-    imports: str
     program_code: str
     program_name: str
 

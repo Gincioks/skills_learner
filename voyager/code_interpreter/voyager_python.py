@@ -161,7 +161,6 @@ class VoyagerPython:
             code = parsed_result["program_code"] + \
                 "\n" + parsed_result["exec_code"]
             events = self.env.step(
-                imports=parsed_result["imports"],
                 code=code,
                 programs=self.skill_manager.programs,
             )

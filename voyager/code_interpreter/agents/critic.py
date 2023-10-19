@@ -18,8 +18,8 @@ class CriticAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            # openai_api_base="http://localhost:8000/v1",
-            # max_tokens=4096,
+            openai_api_base="http://localhost:8000/v1",
+            max_tokens=8192,
         )
         assert mode in ["auto", "manual"]
         self.mode = mode
@@ -47,12 +47,15 @@ class CriticAgent:
 
         observation = ""
 
-        if not current_dir or not workspace or not output:
+        if not current_dir:
             raise ValueError("Missing required fields")
 
         observation += f"Current Dir: {current_dir}\n\n"
 
-        observation += f"Workspace: {workspace}\n\n"
+        if workspace:
+            observation += f"Workspace: {', '.join(workspace)}\n\n"
+        else:
+            observation += f"Workspace: None\n\n"
 
         if error:
             # error = "\n".join(error_messages)

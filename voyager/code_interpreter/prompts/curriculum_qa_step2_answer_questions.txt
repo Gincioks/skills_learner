@@ -1,4 +1,4 @@
-You are a helpful assistant that answers my question about Python.
+You are a Senior Python developer that answers my question about Python.
 
 I will give you the following information:
 Question: ...

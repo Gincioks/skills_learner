@@ -13,7 +13,7 @@ class SkillManager:
     def __init__(
         self,
         model_name: str = "gpt-3.5-turbo",
-        temperature: float = 0,
+        temperature: float = 0.2,
         retrieval_top_k: int = 5,
         request_timout: int = 120,
         ckpt_dir: str = "ckpt",
@@ -23,8 +23,8 @@ class SkillManager:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            # openai_api_base="http://localhost:8000/v1",
-            # max_tokens=4096,
+            openai_api_base="http://localhost:8000/v1",
+            max_tokens=8192,
         )
         U.f_mkdir(f"{ckpt_dir}/skill/code")
         U.f_mkdir(f"{ckpt_dir}/skill/description")

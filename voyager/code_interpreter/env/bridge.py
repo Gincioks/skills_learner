@@ -46,7 +46,6 @@ class VoyagerEnvPython(gym.Env):
 
     def step(
         self,
-        imports: str = "",
         code: str = "",
         programs: str = "",
     ) -> List[PythonEvent]:
@@ -54,7 +53,6 @@ class VoyagerEnvPython(gym.Env):
             raise RuntimeError("Environment has not been reset yet")
         # self.check_process()
         data = {
-            "imports": imports,
             "code": code,
             "programs": programs,
         }
