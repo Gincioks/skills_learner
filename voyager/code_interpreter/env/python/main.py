@@ -4,7 +4,7 @@ import json
 import os
 import subprocess
 import tempfile
-# import llama_cpp.server
+import llama_cpp.server
 from autoimport import fix_code
 import isort
 

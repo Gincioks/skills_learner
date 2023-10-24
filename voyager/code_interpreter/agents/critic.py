@@ -18,8 +18,8 @@ class CriticAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            openai_api_base="http://localhost:8000/v1",
-            max_tokens=8192,
+            openai_api_base="https://85e0-86-100-174-178.ngrok-free.app/v1",
+            max_tokens=4096,
         )
         assert mode in ["auto", "manual"]
         self.mode = mode

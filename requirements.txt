@@ -11,4 +11,3 @@ requests
 setuptools
 gymnasium
 psutil
-minecraft_launcher_lib

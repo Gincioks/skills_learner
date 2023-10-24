@@ -19,7 +19,7 @@ class ActionAgent:
         self,
         model_name: str = "gpt-3.5-turbo",
         temperature: float = 0.2,
-        request_timout: int = 220,
+        request_timout: int = 520,
         ckpt_dir: str = "ckpt",
         resume: bool = False,
         chat_log: bool = True,
@@ -42,7 +42,8 @@ class ActionAgent:
             temperature=temperature,
             request_timeout=request_timout,
             openai_api_base="http://localhost:8000/v1",
-            max_tokens=8192,
+            max_tokens=4096,
+            request_timout=request_timout,
         )
 
     def render_system_message(self, skills=[]):

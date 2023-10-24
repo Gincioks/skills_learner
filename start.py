@@ -60,7 +60,7 @@ voyager.learn(
 #     messages: List[llama_types.ChatCompletionRequestMessage],
 #     **kwargs: Any,
 # ) -> ChatFormatterResponse:
-#     system_template = "<|im_start|> system\n {system_message} \n"
+#     system_template = "<|im_start|>system\n{system_message}\n<|im_end|>\n"
 #     default_system_message = """I carefully provide accurate, factual, thoughtful, nuanced answers and am brilliant at reasoning.
 # I am an assistant who thinks through their answers step-by-step to be sure I always get the right answer.
 # I think more clearly if I write out my thought process in a scratchpad manner first; therefore, I always explain background context, assumptions, and step-by-step thinking BEFORE trying to answer or solve anything."""
@@ -70,11 +70,12 @@ voyager.learn(
 #     )
 #     system_message = system_template.format(system_message=_system_message)
 
-#     _roles = dict(user="<|im_start|> user\n",
-#                   assistant="<|im_start|> assistant\n")
-#     _sep = "<|im_end|>"
-#     _stop_str = ["</s>"]
+#     _roles = dict(user="<|im_start|>user\n",
+#                   assistant="<|im_start|>assistant\n")
+#     _sep = "<|im_end|>\n"
+#     _stop_str = ["<|im_end|>"]
 #     _messages = _map_roles(messages, _roles)
 #     _messages.append((_roles["assistant"], None))
-#     _prompt = _format_add_colon_single(system_message, _messages, _sep)
+#     _prompt = _format_no_colon_single(system_message, _messages, _sep)
+#     print(_prompt)
 #     return ChatFormatterResponse(prompt=_prompt, stop=_stop_str)
