@@ -29,8 +29,8 @@ class CurriculumAgent:
             model_name=model_name,
             temperature=temperature,
             request_timeout=request_timout,
-            openai_api_base="http://localhost:8000/v1",
-            max_tokens=8192,
+            # openai_api_base="http://localhost:8000/v1",
+            # max_tokens=8192,
         )
         self.qa_llm = ChatOpenAI(
             model_name=qa_model_name,

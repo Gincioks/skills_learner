@@ -2,23 +2,22 @@ import re
 import time
 from typing import List, Union, Dict, Any
 
-import openai
 from voyager.code_interpreter.control_primitives_context import load_control_primitives_context
 from voyager.code_interpreter.prompts import load_prompt
 
 from voyager.types import ProposedProgramPython, PythonEvent
 import voyager.utils as U
-from langchain.chat_models import ChatOpenAI
 from langchain.prompts import SystemMessagePromptTemplate
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 import ast
+from model_server import OpenAIChat
 
 
 class ActionAgent:
     def __init__(
         self,
         model_name: str = "gpt-3.5-turbo",
-        temperature: float = 0.2,
+        temperature: float = 0,
         request_timout: int = 520,
         ckpt_dir: str = "ckpt",
         resume: bool = False,
@@ -37,13 +36,10 @@ class ActionAgent:
         # else:
         #     self.chest_memory = {}
 
-        self.llm = ChatOpenAI(
-            model_name=model_name,
+        self.llm = OpenAIChat(
+            api_base="http://74.120.220.89:1190/v1",
+            api_key="sk-tgkrfgbfgb",
             temperature=temperature,
-            request_timeout=request_timout,
-            openai_api_base="http://localhost:8000/v1",
-            max_tokens=4096,
-            request_timout=request_timout,
         )
 
     def render_system_message(self, skills=[]):

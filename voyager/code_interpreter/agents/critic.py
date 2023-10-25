@@ -1,4 +1,5 @@
 from typing import List
+from model_server import OpenAIChat
 from voyager.code_interpreter.prompts import load_prompt
 from voyager.types import PythonEvent
 from voyager.utils.json_utils import fix_and_parse_json
@@ -14,12 +15,17 @@ class CriticAgent:
         request_timout: int = 120,
         mode: str = "auto",
     ):
-        self.llm = ChatOpenAI(
-            model_name=model_name,
+        # self.llm = ChatOpenAI(
+        #     model_name=model_name,
+        #     temperature=temperature,
+        #     request_timeout=request_timout,
+        #     openai_api_base="http://localhost:8000/v1",
+        #     max_tokens=4096,
+        # )
+        self.llm = OpenAIChat(
+            api_base="http://74.120.220.89:1190/v1",
+            api_key="sk-tgkrfgbfgb",
             temperature=temperature,
-            request_timeout=request_timout,
-            openai_api_base="https://85e0-86-100-174-178.ngrok-free.app/v1",
-            max_tokens=4096,
         )
         assert mode in ["auto", "manual"]
         self.mode = mode
@@ -96,7 +102,8 @@ class CriticAgent:
         if messages[1] is None:
             return False, ""
 
-        critic = self.llm(messages).content
+        critic = self.llm.ask(messages[0].content,
+                              [[messages[1].content, ""]]).content
         print(f"\033[31m****Critic Agent ai message****\n{critic}\033[0m")
         try:
             response = fix_and_parse_json(critic)

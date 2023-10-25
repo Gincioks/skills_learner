@@ -23,14 +23,14 @@ voyager.learn(
     init_task="find papers on LLM applications from arxiv in the last week, create a markdown table of different domains and save to file",
     init_context="""
     Notes:
-    - Code executor working in macOS
-    - Use requests, datetime and BeautifulSoup
+    - 
+    -
     Requirements:
-    - find papers on LLM applications from arxiv in the last week
-    - create a markdown table of different domains from papers
-    - make sure the table is sorted by the number of papers in each domain
-    - make sure table is not empty
-    - save to file
+    - Papers on LLM applications from arxiv in the last week
+    - Markdown table of different domains from papers
+    - Table is sorted by the number of papers in each domain
+    - Table is not empty
+    - Table saved to file
     """  # noqa: E501"
 )
 # voyager.learn(
