@@ -11,9 +11,28 @@ Code:
 async def your_function_name():
     # helper functions (only if needed, try to avoid them)
 ```
-...
-Execution:
-```execute
-# execute your function here
-asyncio.run(your_function_name())
+Example:
+```python
+# helper function
+async def get_user(user_id: int) -> dict:
+    return await db.get_user(user_id)
+
+# helper function
+async def get_user_friends(user_id: int) -> list:
+    return await db.get_user_friends(user_id)
+
+# helper function
+async def get_user_posts(user_id: int) -> list:
+    return await db.get_user_posts(user_id)
+
+async def get_user_data(user_id: int) -> dict:
+    user = await get_user(user_id)
+    friends = await get_user_friends(user_id)
+    posts = await get_user_posts(user_id)
+
+    write_file("user.json", json.dumps(user))
+    write_file("friends.json", json.dumps(friends))
+    write_file("posts.json", json.dumps(posts))
+    print("Wrote user data to workspace")
+asyncio.run(get_user_data())
 ```

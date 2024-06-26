@@ -45,6 +45,11 @@ class OpenAIChat:
         messages = self.format_chat_lm(system_message, history)
         prediction = self.make_prediction(messages)
 
+        if prediction["choices"][0]["text"][0] == ":":
+            print(prediction["choices"][0]["text"],
+                  "kas cia---------------------------")
+            return AIMessage(content=prediction["choices"][0]["text"][2:])
+
         return AIMessage(content=prediction["choices"][0]["text"])
 
     def format_chat_lm(self, system_message, history):

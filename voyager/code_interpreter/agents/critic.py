@@ -10,7 +10,8 @@ from langchain.schema import HumanMessage, SystemMessage
 class CriticAgent:
     def __init__(
         self,
-        model_name: str = "gpt-4",
+        # model_name: str = "gpt-4",
+        model_name: str = "mixtral-8x7b-32768",
         temperature: float = 0,
         request_timout: int = 120,
         mode: str = "auto",
@@ -23,8 +24,10 @@ class CriticAgent:
         #     max_tokens=4096,
         # )
         self.llm = OpenAIChat(
-            api_base="http://74.120.220.89:1190/v1",
-            api_key="sk-tgkrfgbfgb",
+            # api_base="https://ejjr2hwtxx60qu-5001.proxy.runpod.net/v1",
+            api_base="https://api.groq.com/openai/v1",
+            # api_base="https://ejjr2hwtxx60qu-5001.proxy.runpod.net/v1",
+            api_key="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",
             temperature=temperature,
         )
         assert mode in ["auto", "manual"]

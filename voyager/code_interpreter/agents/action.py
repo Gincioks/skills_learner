@@ -16,8 +16,9 @@ from model_server import OpenAIChat
 class ActionAgent:
     def __init__(
         self,
-        model_name: str = "gpt-3.5-turbo",
-        temperature: float = 0,
+        # model_name: str = "gpt-3.5-turbo",
+        model_name: str = "mixtral-8x7b-32768",
+        temperature: float = 0.2,
         request_timout: int = 520,
         ckpt_dir: str = "ckpt",
         resume: bool = False,
@@ -37,9 +38,12 @@ class ActionAgent:
         #     self.chest_memory = {}
 
         self.llm = OpenAIChat(
-            api_base="http://74.120.220.89:1190/v1",
-            api_key="sk-tgkrfgbfgb",
+            api_base="https://api.groq.com/openai/v1",
+            # api_base="https://ejjr2hwtxx60qu-5001.proxy.runpod.net/v1",
+            api_key="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",
             temperature=temperature,
+            max_tokens=4096,
+            repetition_penalty=1,
         )
 
     def render_system_message(self, skills=[]):
@@ -50,10 +54,9 @@ class ActionAgent:
 
         # FIXME: Hardcoded control_primitives
         base_skills = [
-            "writeFile",
-            "readFile",
-            "fetchData",
-            "installPackage",
+            "write_file",
+            "read_file",
+            "fetch_data",
         ]
         programs = "\n\n".join(
             load_control_primitives_context(base_skills) + skills)
@@ -176,9 +179,9 @@ class ActionAgent:
                 main_function = None
                 for function in reversed(functions):
                     if function["type"] == "AsyncFunctionDef":
-                        if function["name"] == "main":
-                            raise Exception(
-                                "Your main function name cannot be 'main'.")
+                        # if function["name"] == "main":
+                        #     raise Exception(
+                        #         "Your main function name cannot be 'main'.")
                         main_function = function
                     break
 
